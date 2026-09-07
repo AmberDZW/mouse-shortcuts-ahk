@@ -2,6 +2,10 @@
 #SingleInstance Force
 #UseHook true
 
+if (A_Args.Length > 0 && A_Args[1] = "--check") {
+    ExitApp(0)
+}
+
 logFile := A_ScriptDir "\key-test.log"
 if FileExist(logFile) {
     FileDelete(logFile)
@@ -19,10 +23,28 @@ Log(name) {
 ~XButton1::Log("XButton1")
 ~XButton2::Log("XButton2")
 ~MButton::Log("MButton")
+~WheelUp::Log("WheelUp")
+~WheelDown::Log("WheelDown")
+~WheelLeft::Log("WheelLeft")
+~WheelRight::Log("WheelRight")
 ~Browser_Back::Log("Browser_Back")
 ~Browser_Forward::Log("Browser_Forward")
+~Browser_Home::Log("Browser_Home")
+~Browser_Search::Log("Browser_Search")
+~Browser_Favorites::Log("Browser_Favorites")
+~Browser_Refresh::Log("Browser_Refresh")
+~Browser_Stop::Log("Browser_Stop")
 ~Launch_App1::Log("Launch_App1")
 ~Launch_App2::Log("Launch_App2")
+~Launch_Mail::Log("Launch_Mail")
+~Launch_Media::Log("Launch_Media")
+~Media_Play_Pause::Log("Media_Play_Pause")
+~Media_Next::Log("Media_Next")
+~Media_Prev::Log("Media_Prev")
+~Media_Stop::Log("Media_Stop")
+~Volume_Mute::Log("Volume_Mute")
+~Volume_Down::Log("Volume_Down")
+~Volume_Up::Log("Volume_Up")
 ~F13::Log("F13")
 ~F14::Log("F14")
 ~F15::Log("F15")

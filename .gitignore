@@ -1,3 +1,8 @@
 key-test.log
 *.bak
 *.tmp
+*.tmp.zip
+*.zip
+*.exe
+runtime/
+snippets/
