@@ -2,6 +2,8 @@
 #SingleInstance Force
 #UseHook true
 
+#Include src\LeftButtonVoice.ahk
+
 configFile := A_ScriptDir "\mouse-remap.ini"
 
 if (A_Args.Length > 0 && A_Args[1] = "--check") {
@@ -63,6 +65,7 @@ if (errors != "") {
     MsgBox("Some mappings were skipped:`n`n" errors, "Mouse Shortcuts", "Icon!")
 }
 
+RegisterLeftButtonVoice()
 ConfigureTrayMenu()
 TrayTip("Mouse Shortcuts", "Loaded " loaded " mouse mappings.", 2)
 Persistent()

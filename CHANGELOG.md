@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2
+
+- Turned voice typing off when the left button is released after a qualifying hold, making the two-second gesture behave as push-to-talk.
+
+## 1.0.1
+
+- Added a pass-through left-button hold gesture that sends Win+H after two seconds without pointer movement; short clicks still pass through and dragging cancels the gesture.
+
 ## 1.0.0
 
 - Replaced the script-oriented portable bundle with one compiled `MouseShortcuts.exe` entry point.

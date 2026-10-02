@@ -116,7 +116,7 @@ if (Test-Path -LiteralPath $ReleaseReadme -PathType Leaf) {
 }
 
 $version = if (Test-Path -LiteralPath $VersionFile) { (Get-Content -LiteralPath $VersionFile -Raw).Trim() } else { "" }
-Assert-Equal $version "1.0.0" "VERSION must identify the 1.0.0 release"
+Assert-Equal $version "1.0.2" "VERSION must identify the 1.0.2 release"
 
 Test-MissingDependency "SourcePath" "Source script not found"
 Test-MissingDependency "CompilerPath" "Ahk2Exe compiler not found"

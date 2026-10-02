@@ -1,6 +1,8 @@
 #Requires AutoHotkey v2.0
 
-global gVersion := "1.0.0"
+#Include %A_LineFile%\..\LeftButtonVoice.ahk
+
+global gVersion := "1.0.2"
 global gLanguage := DetectSystemLanguage()
 global gDataDir := ""
 global gConfigPath := ""
@@ -354,6 +356,7 @@ RegisterConfigurationHotkeys(config) {
     global gActiveHotkeys
     registered := []
     try {
+        registered := RegisterLeftButtonVoice()
         for definition in GetMappingDefinitions() {
             mapping := config.mappings[definition.id]
             if IsDisabled(mapping.action) {
@@ -384,6 +387,7 @@ RegisterConfigurationHotkeys(config) {
 
 UnregisterConfigurationHotkeys() {
     global gActiveHotkeys
+    CancelLeftButtonVoice()
     for specification in gActiveHotkeys {
         try Hotkey(specification, "Off")
     }
@@ -1044,6 +1048,7 @@ PauseTool(*) {
     if gCaptureActive {
         return
     }
+    CancelLeftButtonVoice()
     Suspend(true)
     gPaused := true
     UpdateStatus("paused")

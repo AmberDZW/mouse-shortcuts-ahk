@@ -2,7 +2,7 @@
 
 ## 解压后直接使用
 
-1. 下载并**完整解压** `MouseShortcuts-1.0.0.zip`。
+1. 下载 [MouseShortcuts-1.0.2.zip](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.2/MouseShortcuts-1.0.2.zip) 并**完整解压**。
 2. 双击解压目录中的 `MouseShortcuts.exe`。
 3. 不需要安装 AutoHotkey，也不需要安装其他运行环境。
 
@@ -12,6 +12,7 @@ Mouse Shortcuts 是面向普通 Windows 用户的鼠标快捷键和常用文本�
 
 ## 默认按键
 
+- 左键静止长按 2 秒：语音输入 `Win+H`，每次按住只触发一次；拖拽会取消长按计时。
 - 鼠标中键：语音输入 `Win+H`
 - 侧上键：回车
 - 侧下键：退格
