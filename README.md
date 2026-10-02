@@ -1,60 +1,61 @@
 # Mouse Shortcuts
 
-## 解压后直接使用
+### Put the actions you repeat most on the mouse you already use.
 
-1. 下载 [MouseShortcuts-1.0.2.zip](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.2/MouseShortcuts-1.0.2.zip) 并**完整解压**。
-2. 双击解压目录中的 `MouseShortcuts.exe`。
-3. 不需要安装 AutoHotkey，也不需要安装其他运行环境。
+[Download v1.0.2](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.2/MouseShortcuts-1.0.2.zip) · [简体中文](README.zh-CN.md) · [Changelog](CHANGELOG.md)
 
-> 不要直接在压缩包预览窗口里运行。请先解压整个文件夹，再双击 `MouseShortcuts.exe`。
+Mouse Shortcuts is a small Windows tray app for turning mouse buttons into practical shortcuts. Hold the left button to start Windows Voice Typing, tap a side button for Enter or Backspace, or paste a saved phrase without reaching for the keyboard.
 
-Mouse Shortcuts 是面向普通 Windows 用户的鼠标快捷键和常用文本工具。发布包只有一个程序入口，不包含需要用户选择的脚本、命令文件或配置文件。
+## Default controls
 
-## 默认按键
+| Mouse action | Result |
+| --- | --- |
+| Hold the left button still for 2 seconds | Start Windows Voice Typing (`Win+H`); release to end the voice session |
+| Middle button | Start Windows Voice Typing (`Win+H`) |
+| Upper side button | Enter |
+| Lower side button | Backspace |
 
-- 左键静止长按 2 秒：开始语音输入 `Win+H`，松开后结束本次语音输入；拖拽会取消长按计时。
-- 鼠标中键：语音输入 `Win+H`
-- 侧上键：回车
-- 侧下键：退格
+Left clicks pass through to Windows as usual. Moving the pointer far enough to begin a drag cancels the left-button hold before it activates. The left hold-to-talk gesture is built in; the middle- and side-button mappings can be changed in Settings.
 
-滚轮、侧滚轮、浏览器键和扩展键会显示在设置中，但默认不启用。
+## Why keep it around?
 
-## 设置与托盘
+- **Reach fewer keys.** Put familiar actions such as copy, paste, undo, media controls, or browser navigation on buttons your hand already finds.
+- **Speak without a keyboard detour.** A stationary two-second left-button hold starts Windows Voice Typing; releasing the button ends that voice session.
+- **Reuse the phrases you type every day.** Save up to five Unicode or multiline text snippets and assign each its own keyboard shortcut.
+- **Adjust it without editing scripts.** The bilingual Settings window can detect buttons, change actions, warn about shortcut conflicts, and apply changes immediately.
+- **Keep it out of the way.** Mouse Shortcuts lives in the system tray, with pause/resume and optional Windows startup controls.
 
-双击 `MouseShortcuts.exe` 可打开设置窗口。界面支持中文和 English，并会记住上次使用的语言。
+## Get started
 
-可以在设置窗口中：
+1. Download and fully extract [`MouseShortcuts-1.0.2.zip`](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.2/MouseShortcuts-1.0.2.zip).
+2. Double-click `MouseShortcuts.exe`.
+3. Open Settings from the tray icon to change mappings or add text snippets.
 
-- 为每个可识别的鼠标按键选择动作。
-- 录入和检测按键，不需要填写 AutoHotkey 语法。
-- 保存至少五组中文、英文或多行常用文本。
-- 查看重复按键和可能的快捷键冲突。
-- 开启或关闭 Windows 开机启动。
-- 恢复默认设置，或导入、导出配置。
-- 保存并立即应用设置。
+The portable package includes what it needs; you do not need to install AutoHotkey. Your settings are kept in `%LOCALAPPDATA%\MouseShortcuts\settings.msconfig`, separately from the executable, so replacing the app with a newer release preserves them.
 
-程序运行后会常驻 Windows 右下角托盘。托盘菜单可打开设置、暂停、恢复或退出，并显示当前运行状态。
+## Make it yours
 
-## 配置与升级
+Settings includes common mouse buttons, wheel directions, browser and media buttons, launch buttons, and F13–F24. Hardware-specific buttons are available when the mouse driver exposes them to Windows as standard keys. Use the built-in button detector if you are not sure how Windows identifies a button.
 
-个人设置保存在 `%LOCALAPPDATA%\MouseShortcuts\settings.msconfig`，不放在发布包内。安装新版本时解压并运行新的 `MouseShortcuts.exe`，原有按键、语言和常用文本会继续保留。
+You can also:
 
-从 0.7 升级时，工具会优先自动查找相邻旧目录、正在运行的旧版或旧版开机启动位置。如果旧版放在其他目录，也可以在“导入配置”中直接选择旧的 `mouse-remap.ini`。
+- choose from common keyboard and Windows actions;
+- pause or resume shortcuts from the tray;
+- enable or disable startup with Windows;
+- import and export your settings.
 
-导出的配置可能包含个人常用文本。分享配置文件前请检查内容。
+Exported settings may contain the phrases you saved. Review the file before sharing it.
 
-## 支持的按键范围
+## Local behavior
 
-工具支持中键、侧键、滚轮、侧滚轮、浏览器键，以及 Windows 能识别的媒体键、启动键和 F13-F24 等扩展键。厂商专用按键需要先由鼠标驱动暴露为 Windows 可识别的按键；完全封闭的专有硬件信号无法保证通用识别。
+Mouse Shortcuts runs its mappings on your PC and stores its settings locally. For voice input, it sends the `Win+H` shortcut to open Windows Voice Typing; microphone access and speech processing are handled by Windows. Mouse Shortcuts does not record audio itself.
 
-## 源码构建
+The app does not require administrator privileges or an account. A mouse button only works when Windows and its driver expose it as a supported key.
 
-最终用户不需要本节中的工具。维护者构建说明见 [PUBLISHING.md](PUBLISHING.md)，发布验证运行：
+## For contributors
 
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\Release.Tests.ps1
-```
+The source is AutoHotkey v2. See [PUBLISHING.md](PUBLISHING.md) for build requirements and release packaging, and [CONTRIBUTING.md](CONTRIBUTING.md) for development notes.
 
-## License
+Mouse Shortcuts is [MIT licensed](LICENSE). The release package includes the required AutoHotkey notices.
 
-Mouse Shortcuts 源码使用 MIT License。编译后的便携程序包含 AutoHotkey v2 运行时；完整第三方说明和 AutoHotkey 许可证文本位于发布包的 `THIRD_PARTY_NOTICES.txt`。
+If this makes a repetitive part of your day easier, a ⭐ helps other Windows users find it.

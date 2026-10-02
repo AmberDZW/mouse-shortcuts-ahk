@@ -1,34 +1,47 @@
 Mouse Shortcuts / 鼠标快捷键工具
 ================================
 
-先解压，再运行：
+把每天反复用到的动作，放到手边的鼠标上。
 
-1. 解压整个 MouseShortcuts 压缩包。
+Mouse Shortcuts is a small Windows tray app for mouse shortcuts and saved text.
+鼠标快捷键工具可将常用动作和文本放到鼠标按键上。
+
+默认按键 / Default controls
+---------------------------
+
+- 左键静止长按 2 秒：启动 Windows 语音输入（Win+H）；松开后结束本次语音输入。
+- Hold the left button still for 2 seconds to start Windows Voice Typing; release to end the session.
+- 鼠标中键 / Middle button：语音输入 / Voice Typing（Win+H）
+- 侧上键 / Upper side button：回车 / Enter
+- 侧下键 / Lower side button：退格 / Backspace
+
+左键普通点击仍照常工作。拖动鼠标会在长按触发前取消计时。
+Ordinary left clicks pass through; dragging cancels the hold before it activates.
+
+快速开始 / Quick start
+---------------------
+
+1. 完整解压 MouseShortcuts-1.0.2.zip。
+   Fully extract MouseShortcuts-1.0.2.zip.
 2. 双击 MouseShortcuts.exe。
-3. 不需要安装 AutoHotkey，也不需要安装其他运行环境。
+   Double-click MouseShortcuts.exe.
+3. 从托盘图标打开设置。
+   Open Settings from the system tray.
 
-重要：不要直接在压缩包窗口里运行 MouseShortcuts.exe。
-请先把整个文件夹解压到普通文件夹，否则设置可能无法正常保存。
+不需要单独安装 AutoHotkey。设置保存在当前 Windows 用户目录中，更新程序不会覆盖它们。
+No separate AutoHotkey installation is required. Settings stay in your Windows user profile across app updates.
 
-默认设置
---------
+在设置中可修改按键、检测鼠标按键、管理五条多语言/多行文本，或启用开机启动。
+Use Settings to change mappings, detect buttons, manage five Unicode/multiline text snippets, and optionally start with Windows.
 
-- 左键静止长按 2 秒：开始语音输入（Win+H），松开后结束本次语音输入；拖拽取消计时。
-- 鼠标中键：语音输入（Win+H）
-- 侧上键：回车
-- 侧下键：退格
+个人设置保存在 `%LOCALAPPDATA%\MouseShortcuts\settings.msconfig`，更新程序不会覆盖。托盘菜单可打开设置、暂停、恢复或退出。
+Settings are stored in your Windows user profile and persist across updates. Use the tray menu to open Settings, pause, resume, or exit.
 
-打开后可在中文或 English 界面中修改按键、设置五组常用文本、
-检测鼠标按键、设置开机启动，以及导入或导出配置。
-从旧版升级且未自动找到设置时，可在“导入配置”中选择旧的 mouse-remap.ini。
-关闭设置窗口后，工具会继续在 Windows 右下角托盘中运行。
+如果旧版设置没有自动迁移，可在设置中导入 `mouse-remap.ini`。
+If settings from a legacy copy are not found automatically, import its `mouse-remap.ini` from Settings.
 
-English quick start
--------------------
+语音输入由 Windows Voice Typing 处理。Mouse Shortcuts 发送 Win+H，不会自行录制音频。
+Windows handles voice input. Mouse Shortcuts sends Win+H and does not record audio itself.
 
-1. Extract the complete MouseShortcuts folder from the zip.
-2. Double-click MouseShortcuts.exe.
-3. No AutoHotkey installation or other runtime is required.
-
-Do not run MouseShortcuts.exe from inside the zip preview window.
-Use the tray icon to open Settings, pause or resume shortcuts, or exit.
+许可 / License: MIT. AutoHotkey notices are included in THIRD_PARTY_NOTICES.txt.
+更多信息 / More: https://github.com/AmberDZW/mouse-shortcuts-ahk
