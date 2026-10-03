@@ -46,6 +46,8 @@ try {
     Assert-True (Test-Path $exportPath) "Default export creates a config file"
     $exportedText = Get-Content $exportPath -Raw
     Assert-True ($exportedText -match "language=zh-CN") "Export remembers Chinese language"
+    Assert-True ($exportedText -match "leftButtonVoiceEnabled=1") "Export enables left-button hold-to-talk by default"
+    Assert-True ($exportedText -match "leftButtonVoiceHoldMs=2000") "Export preserves the default two-second hold duration"
     Assert-True ($exportedText -match "middle=MButton\|voice") "Export contains the requested middle-button default"
     Assert-True ($exportedText -match "side_up=XButton2\|enter") "Export contains the requested upper-side default"
     Assert-True ($exportedText -match "side_down=XButton1\|backspace") "Export contains the requested lower-side default"

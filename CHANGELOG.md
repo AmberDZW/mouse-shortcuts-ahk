@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3
+
+- Added an enable switch and adjustable 0.5–5 second left-button voice wake-up duration in Settings.
+- Open Settings with a single click on the tray icon; closing Settings keeps shortcuts running in the tray.
+
 ## 1.0.2
 
 - Turned voice typing off when the left button is released after a qualifying hold, making the two-second gesture behave as push-to-talk.

@@ -2,7 +2,7 @@
 
 #Include %A_LineFile%\..\LeftButtonVoice.ahk
 
-global gVersion := "1.0.2"
+global gVersion := "1.0.3"
 global gLanguage := DetectSystemLanguage()
 global gDataDir := ""
 global gConfigPath := ""
@@ -18,6 +18,8 @@ global gTabs := 0
 global gStatusText := 0
 global gMappingRows := []
 global gMappingGroupSelector := 0
+global gLeftButtonVoiceCheck := 0
+global gLeftButtonVoiceHoldChoice := 0
 global gSnippetRows := []
 global gSnippetSelector := 0
 global gLanguageChoice := 0
@@ -72,6 +74,7 @@ RunApplicationSelfTest() {
         SaveConfigFile(config, path)
         loaded := LoadConfigFile(path, "en-US")
         if (loaded.language != "zh-CN" || loaded.mappings["middle"].action != "voice"
+            || !loaded.leftButtonVoiceEnabled || loaded.leftButtonVoiceHoldMs != 2000
             || loaded.snippets.Length != 5) {
             throw Error("Configuration round trip failed")
         }
@@ -91,16 +94,30 @@ RunApplicationSelfTest() {
 
 RunUiSmokeTest() {
     global gTestMode, gLanguage, gActiveConfig, gState, gSettingsGui
-    global gMappingRows, gSnippetRows, gStartupSyncFailed, gActiveHotkeys, gPaused
+    global gMappingRows, gLeftButtonVoiceCheck, gLeftButtonVoiceHoldChoice, gSnippetRows
+    global gStartupSyncFailed, gActiveHotkeys, gPaused
     try {
         gTestMode := true
         gLanguage := "zh-CN"
         gActiveConfig := CreateDefaultConfig(gLanguage)
         gState := "stopped"
         BuildSettingsGui(gActiveConfig)
-        if (gMappingRows.Length != 15 || gSnippetRows.Length != 5 || !gSettingsGui.Hwnd) {
+        if (gMappingRows.Length != 15 || gSnippetRows.Length != 5 || !gSettingsGui.Hwnd
+            || !IsObject(gLeftButtonVoiceCheck) || !gLeftButtonVoiceCheck.Hwnd
+            || gLeftButtonVoiceCheck.Value != 1 || !IsObject(gLeftButtonVoiceHoldChoice)
+            || !gLeftButtonVoiceHoldChoice.Hwnd || gLeftButtonVoiceHoldChoice.Value != 4) {
             throw Error("Unexpected settings control count")
         }
+        gLeftButtonVoiceCheck.Value := 0
+        if CollectConfigFromGui().leftButtonVoiceEnabled {
+            throw Error("Left-button voice setting was not collected when unchecked")
+        }
+        gLeftButtonVoiceCheck.Value := 1
+        gLeftButtonVoiceHoldChoice.Choose(3)
+        if (CollectConfigFromGui().leftButtonVoiceHoldMs != 1500) {
+            throw Error("Left-button hold duration was not collected from the selected value")
+        }
+        gLeftButtonVoiceHoldChoice.Choose(4)
         for control in gSnippetRows[1].controls {
             if !control.Visible {
                 throw Error("First text shortcut controls are hidden")
@@ -356,7 +373,9 @@ RegisterConfigurationHotkeys(config) {
     global gActiveHotkeys
     registered := []
     try {
-        registered := RegisterLeftButtonVoice()
+        if config.leftButtonVoiceEnabled {
+            registered := RegisterLeftButtonVoice(config.leftButtonVoiceHoldMs)
+        }
         for definition in GetMappingDefinitions() {
             mapping := config.mappings[definition.id]
             if IsDisabled(mapping.action) {
@@ -759,7 +778,8 @@ EnsureLegacyRuntimeStopped() {
 }
 
 BuildSettingsGui(configToShow) {
-    global gSettingsGui, gTabs, gStatusText, gMappingRows, gSnippetRows
+    global gSettingsGui, gTabs, gStatusText, gMappingRows, gLeftButtonVoiceCheck
+    global gLeftButtonVoiceHoldChoice, gSnippetRows
     global gLanguageChoice, gAutostartCheck, gTestMode, gSnippetSelector, gMappingGroupSelector
 
     if IsObject(gSettingsGui) {
@@ -816,6 +836,27 @@ BuildSettingsGui(configToShow) {
         gMappingRows.Push({definition: definition, keyControl: keyControl,
             actionControl: actionControl, group: isCommon ? 1 : 2, controls: controls})
     }
+
+    gLeftButtonVoiceCheck := gSettingsGui.Add("CheckBox", "x55 y410 w265 h28", T("left_hold_voice"))
+    gLeftButtonVoiceCheck.Value := configToShow.leftButtonVoiceEnabled ? 1 : 0
+    holdOptions := GetLeftButtonVoiceHoldOptions()
+    holdLabels := []
+    for option in holdOptions {
+        holdLabels.Push(option.label)
+    }
+    gSettingsGui.Add("Text", "x340 y410 w90 h25 +0x200", T("left_hold_duration"))
+    gLeftButtonVoiceHoldChoice := gSettingsGui.Add("DropDownList", "x430 y408 w72", holdLabels)
+    holdChoiceIndex := 4
+    for index, option in holdOptions {
+        if (option.milliseconds = configToShow.leftButtonVoiceHoldMs) {
+            holdChoiceIndex := index
+            break
+        }
+    }
+    gLeftButtonVoiceHoldChoice.Choose(holdChoiceIndex)
+    gSettingsGui.Add("Text", "x510 y410 w70 h25 +0x200", T("seconds"))
+    holdHint := gSettingsGui.Add("Text", "x55 y440 w680 h20", T("left_hold_hint"))
+    holdHint.SetFont("s8 c666666")
 
     gTabs.UseTab(2)
     snippetTabNames := []
@@ -910,9 +951,15 @@ ActionIndex(actionId) {
 }
 
 CollectConfigFromGui() {
-    global gMappingRows, gSnippetRows, gLanguageChoice, gAutostartCheck
+    global gMappingRows, gLeftButtonVoiceCheck, gLeftButtonVoiceHoldChoice
+    global gSnippetRows, gLanguageChoice, gAutostartCheck
     config := CreateDefaultConfig(gLanguageChoice.Value = 1 ? "zh-CN" : "en-US")
     config.autostart := gAutostartCheck.Value = 1
+    config.leftButtonVoiceEnabled := gLeftButtonVoiceCheck.Value = 1
+    holdOptions := GetLeftButtonVoiceHoldOptions()
+    holdChoiceIndex := gLeftButtonVoiceHoldChoice.Value
+    config.leftButtonVoiceHoldMs := holdChoiceIndex > 0
+        ? holdOptions[holdChoiceIndex].milliseconds : 2000
 
     actionIds := GetActionIds()
     for row in gMappingRows {
@@ -1033,6 +1080,7 @@ ConfigureTrayMenu() {
     A_TrayMenu.Delete()
     A_TrayMenu.Add(T("settings"), ShowSettings)
     A_TrayMenu.Default := T("settings")
+    A_TrayMenu.ClickCount := 1
     A_TrayMenu.Add()
     if !gCaptureActive && (gState = "running" || (gState = "error" && gActiveHotkeys.Length)) {
         A_TrayMenu.Add(T("pause"), PauseTool)

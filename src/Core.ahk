@@ -95,9 +95,35 @@ CreateDefaultConfig(language := "en-US") {
         schema: 1,
         language: NormalizeLanguage(language),
         autostart: false,
+        leftButtonVoiceEnabled: true,
+        leftButtonVoiceHoldMs: 2000,
         mappings: mappings,
         snippets: snippets
     }
+}
+
+GetLeftButtonVoiceHoldOptions() {
+    return [
+        {milliseconds: 500, label: "0.5"},
+        {milliseconds: 1000, label: "1"},
+        {milliseconds: 1500, label: "1.5"},
+        {milliseconds: 2000, label: "2"},
+        {milliseconds: 2500, label: "2.5"},
+        {milliseconds: 3000, label: "3"},
+        {milliseconds: 3500, label: "3.5"},
+        {milliseconds: 4000, label: "4"},
+        {milliseconds: 4500, label: "4.5"},
+        {milliseconds: 5000, label: "5"}
+    ]
+}
+
+IsSupportedLeftButtonVoiceHoldDuration(milliseconds) {
+    for option in GetLeftButtonVoiceHoldOptions() {
+        if (option.milliseconds = milliseconds) {
+            return true
+        }
+    }
+    return false
 }
 
 NormalizeLanguage(value) {
@@ -176,6 +202,10 @@ ValidateConfig(config) {
         } else {
             used[canonical] := definition.id
         }
+    }
+
+    if !IsSupportedLeftButtonVoiceHoldDuration(config.leftButtonVoiceHoldMs) {
+        errors.Push({code: "invalid_left_hold_duration", value: config.leftButtonVoiceHoldMs})
     }
 
     if (config.snippets.Length < 5) {
@@ -261,6 +291,8 @@ SaveConfigFile(config, filePath) {
     IniWrite(1, tempPath, "Meta", "schema")
     IniWrite(NormalizeLanguage(config.language), tempPath, "Meta", "language")
     IniWrite(config.autostart ? 1 : 0, tempPath, "Meta", "autostart")
+    IniWrite(config.leftButtonVoiceEnabled ? 1 : 0, tempPath, "Meta", "leftButtonVoiceEnabled")
+    IniWrite(config.leftButtonVoiceHoldMs, tempPath, "Meta", "leftButtonVoiceHoldMs")
 
     for definition in GetMappingDefinitions() {
         mapping := config.mappings[definition.id]
@@ -292,6 +324,21 @@ LoadConfigFile(filePath, fallbackLanguage := "en-US") {
     }
     config.language := NormalizeLanguage(IniRead(filePath, "Meta", "language", config.language))
     config.autostart := IniRead(filePath, "Meta", "autostart", "0") = "1"
+    leftButtonVoiceSetting := IniRead(filePath, "Meta", "leftButtonVoiceEnabled",
+        config.leftButtonVoiceEnabled ? "1" : "0")
+    if (leftButtonVoiceSetting != "0" && leftButtonVoiceSetting != "1") {
+        throw Error("config_invalid_left_voice")
+    }
+    config.leftButtonVoiceEnabled := leftButtonVoiceSetting = "1"
+    leftButtonVoiceHoldSetting := IniRead(filePath, "Meta", "leftButtonVoiceHoldMs",
+        config.leftButtonVoiceHoldMs)
+    if !RegExMatch(leftButtonVoiceHoldSetting, "^\d+$") {
+        throw Error("config_invalid_left_hold_duration")
+    }
+    config.leftButtonVoiceHoldMs := Integer(leftButtonVoiceHoldSetting)
+    if !IsSupportedLeftButtonVoiceHoldDuration(config.leftButtonVoiceHoldMs) {
+        throw Error("config_invalid_left_hold_duration")
+    }
 
     for definition in GetMappingDefinitions() {
         saved := IniRead(filePath, "Mappings", definition.id, "__MISSING__")

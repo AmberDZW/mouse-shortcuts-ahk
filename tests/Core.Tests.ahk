@@ -39,6 +39,8 @@ TestDefaults() {
     AssertEqual(config.mappings["side_down"].key, "XButton1", "Lower side button key")
     AssertEqual(config.mappings["side_down"].action, "backspace", "Lower side button action")
     AssertEqual(config.mappings["wheel_up"].action, "disabled", "Unused buttons stay visible but disabled")
+    AssertTrue(config.leftButtonVoiceEnabled, "Left-button voice typing should be enabled by default")
+    AssertEqual(config.leftButtonVoiceHoldMs, 2000, "Left-button voice wake delay should default to two seconds")
     AssertEqual(config.snippets.Length, 5, "Five text shortcut slots")
 }
 
@@ -73,12 +75,19 @@ TestConflictValidation() {
     config.snippets[1].text := ""
     result := ValidateConfig(config)
     AssertTrue(result.errors.Length > 0, "Enabled text shortcut requires content")
+
+    config := CreateDefaultConfig("en-US")
+    config.leftButtonVoiceHoldMs := 600
+    result := ValidateConfig(config)
+    AssertTrue(result.errors.Length > 0, "Unsupported left-button hold durations should be rejected")
 }
 
 TestPersistence() {
     path := A_Temp "\MouseShortcuts-Core-Test-" A_TickCount ".ini"
     config := CreateDefaultConfig("en-US")
     config.autostart := true
+    config.leftButtonVoiceEnabled := false
+    config.leftButtonVoiceHoldMs := 1500
     config.mappings["extra_1"].key := "F17"
     config.mappings["extra_1"].action := "copy"
     config.snippets[1].hotkey := "^!1"
@@ -88,10 +97,23 @@ TestPersistence() {
     loaded := LoadConfigFile(path, "zh-CN")
     AssertEqual(loaded.language, "en-US", "Saved language should load")
     AssertTrue(loaded.autostart, "Autostart should round trip")
+    AssertTrue(!loaded.leftButtonVoiceEnabled, "Left-button voice toggle should round trip")
+    AssertEqual(loaded.leftButtonVoiceHoldMs, 1500, "Left-button hold duration should round trip")
     AssertEqual(loaded.mappings["extra_1"].key, "F17", "Custom key should round trip")
     AssertEqual(loaded.mappings["extra_1"].action, "copy", "Custom action should round trip")
     AssertEqual(loaded.snippets[1].hotkey, "^!1", "Text hotkey should round trip")
     AssertEqual(loaded.snippets[1].text, "你好`r`nHello", "Text content should round trip")
+    FileDelete(path)
+}
+
+TestMissingLeftButtonVoiceSettings() {
+    path := A_Temp "\MouseShortcuts-Old-Config-Test-" A_TickCount ".msconfig"
+    SaveConfigFile(CreateDefaultConfig("en-US"), path)
+    IniDelete(path, "Meta", "leftButtonVoiceEnabled")
+    IniDelete(path, "Meta", "leftButtonVoiceHoldMs")
+    loaded := LoadConfigFile(path, "en-US")
+    AssertTrue(loaded.leftButtonVoiceEnabled, "Older config should preserve the built-in left-button voice behavior")
+    AssertEqual(loaded.leftButtonVoiceHoldMs, 2000, "Older config should default the left-button wake delay to two seconds")
     FileDelete(path)
 }
 
@@ -139,6 +161,8 @@ TestLegacyLoad() {
     AssertEqual(loaded.snippets[1].hotkey, "^!1", "Legacy text hotkey should migrate")
     AssertEqual(loaded.snippets[1].text, snippetText, "Legacy Unicode multiline text should migrate")
     AssertTrue(loaded.autostart, "Manual legacy import should preserve the current autostart choice")
+    AssertTrue(loaded.leftButtonVoiceEnabled, "Legacy config should keep the default left-button voice behavior")
+    AssertEqual(loaded.leftButtonVoiceHoldMs, 2000, "Legacy config should default the left-button wake delay to two seconds")
     AssertEqual(ValidateConfig(loaded).errors.Length, 0, "Migrated legacy configuration should validate")
     DirDelete(root, true)
 }
@@ -161,6 +185,7 @@ TestLanguageNormalization()
 TestTextCodec()
 TestConflictValidation()
 TestPersistence()
+TestMissingLeftButtonVoiceSettings()
 TestRejectsInvalidImports()
 TestLegacyDiscovery()
 TestLegacyLoad()
@@ -174,5 +199,5 @@ if failures.Length {
     ExitApp(1)
 }
 
-FileAppend("PASS: Core.Tests (" 10 " groups)`n", "*", "UTF-8")
+FileAppend("PASS: Core.Tests (" 11 " groups)`n", "*", "UTF-8")
 ExitApp(0)

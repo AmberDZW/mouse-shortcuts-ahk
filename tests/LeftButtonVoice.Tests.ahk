@@ -54,8 +54,16 @@ try {
     AssertTrue(UpdateLeftButtonVoice(true, press.x, press.y, press.startedAt + 2000),
         "A fresh hold must trigger again")
 
-    registered := RegisterLeftButtonVoice()
+    press := StartPress()
+    AssertTrue(!UpdateLeftButtonVoice(true, press.x, press.y, press.startedAt + 1499, true, 1500),
+        "A configured 1.5-second hold must not trigger early")
+    AssertTrue(UpdateLeftButtonVoice(true, press.x, press.y, press.startedAt + 1500, true, 1500),
+        "A configured 1.5-second hold must trigger at its selected duration")
+    EndLeftButtonVoice(false)
+
+    registered := RegisterLeftButtonVoice(1500)
     AssertTrue(registered.Length = 2, "Both pass-through mouse hooks must register")
+    AssertTrue(gLeftButtonVoiceHoldMs = 1500, "Registration must apply the selected hold duration")
     for specification in registered {
         Hotkey(specification, "Off")
     }

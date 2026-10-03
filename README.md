@@ -2,7 +2,7 @@
 
 ### Put the actions you repeat most on the mouse you already use.
 
-[Download v1.0.2](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.2/MouseShortcuts-1.0.2.zip) · [简体中文](README.zh-CN.md) · [Changelog](CHANGELOG.md)
+[Download v1.0.3](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.3/MouseShortcuts-1.0.3.zip) · [简体中文](README.zh-CN.md) · [Changelog](CHANGELOG.md)
 
 Mouse Shortcuts is a small Windows tray app for turning mouse buttons into practical shortcuts. Hold the left button to start Windows Voice Typing, tap a side button for Enter or Backspace, or paste a saved phrase without reaching for the keyboard.
 
@@ -15,7 +15,7 @@ Mouse Shortcuts is a small Windows tray app for turning mouse buttons into pract
 | Upper side button | Enter |
 | Lower side button | Backspace |
 
-Left clicks pass through to Windows as usual. Moving the pointer far enough to begin a drag cancels the left-button hold before it activates. The left hold-to-talk gesture is built in; the middle- and side-button mappings can be changed in Settings.
+Left clicks pass through to Windows as usual. Moving the pointer far enough to begin a drag cancels the left-button hold before it activates. Settings lets you enable or disable the left hold-to-talk gesture and choose its wake-up time from 0.5 to 5 seconds. The middle- and side-button mappings can also be changed.
 
 ## Why keep it around?
 
@@ -27,9 +27,9 @@ Left clicks pass through to Windows as usual. Moving the pointer far enough to b
 
 ## Get started
 
-1. Download and fully extract [`MouseShortcuts-1.0.2.zip`](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.2/MouseShortcuts-1.0.2.zip).
-2. Double-click `MouseShortcuts.exe`.
-3. Open Settings from the tray icon to change mappings or add text snippets.
+1. Download and fully extract [`MouseShortcuts-1.0.3.zip`](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.3/MouseShortcuts-1.0.3.zip).
+2. Double-click `MouseShortcuts.exe`; shortcuts start automatically.
+3. Click the tray icon to open Settings, then save and apply your changes. Closing Settings keeps shortcuts running in the tray.
 
 The portable package includes what it needs; you do not need to install AutoHotkey. Your settings are kept in `%LOCALAPPDATA%\MouseShortcuts\settings.msconfig`, separately from the executable, so replacing the app with a newer release preserves them.
 

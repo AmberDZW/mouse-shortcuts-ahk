@@ -2,7 +2,7 @@
 
 ### 把每天反复用到的动作，放到手边的鼠标上。
 
-[下载 v1.0.2](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.2/MouseShortcuts-1.0.2.zip) · [English](README.md) · [更新记录](CHANGELOG.md)
+[下载 v1.0.3](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.3/MouseShortcuts-1.0.3.zip) · [English](README.md) · [更新记录](CHANGELOG.md)
 
 Mouse Shortcuts 是一个常驻 Windows 托盘的小工具，可以把鼠标按键变成常用快捷动作：按住左键打开 Windows 语音输入，侧键发送回车或退格，也可以一键输入保存好的常用文本。
 
@@ -15,7 +15,7 @@ Mouse Shortcuts 是一个常驻 Windows 托盘的小工具，可以把鼠标按�
 | 侧上键 | 回车 |
 | 侧下键 | 退格 |
 
-左键点击仍会正常传给 Windows。指针移动到足以开始拖动时，长按计时会在触发前取消。左键长按说话是内置动作；中键和侧键映射可以在设置里修改。
+左键点击仍会正常传给 Windows。指针移动到足以开始拖动时，长按计时会在触发前取消。在设置中可以启用或关闭左键长按说话，并选择 0.5–5 秒的唤醒时长；中键和侧键映射也可以修改。
 
 ## 为什么把它留在托盘里
 
@@ -27,9 +27,9 @@ Mouse Shortcuts 是一个常驻 Windows 托盘的小工具，可以把鼠标按�
 
 ## 三步开始
 
-1. 下载并完整解压 [`MouseShortcuts-1.0.2.zip`](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.2/MouseShortcuts-1.0.2.zip)。
-2. 双击 `MouseShortcuts.exe`。
-3. 从托盘图标打开设置，修改按键或录入常用文本。
+1. 下载并完整解压 [`MouseShortcuts-1.0.3.zip`](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.3/MouseShortcuts-1.0.3.zip)。
+2. 双击 `MouseShortcuts.exe`，按键功能会自动启动。
+3. 单击托盘图标打开设置，修改后点击“保存并立即生效”。关闭设置窗口后，功能继续在托盘运行。
 
 便携包已包含运行所需内容，不需要单独安装 AutoHotkey。个人设置保存在 `%LOCALAPPDATA%\MouseShortcuts\settings.msconfig`，与程序文件分开；换新版本不会覆盖你的按键、语言或文本。
 
