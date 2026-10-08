@@ -2,6 +2,7 @@
 
 GetMappingDefinitions() {
     static definitions := [
+        {id: "right", label: "right", key: "RButton", action: "disabled", group: "primary"},
         {id: "middle", label: "middle", key: "MButton", action: "voice", group: "primary"},
         {id: "side_up", label: "side_up", key: "XButton2", action: "enter", group: "primary"},
         {id: "side_down", label: "side_down", key: "XButton1", action: "backspace", group: "primary"},
@@ -23,7 +24,7 @@ GetMappingDefinitions() {
 
 GetSupportedKeys() {
     return [
-        "MButton", "XButton1", "XButton2",
+        "RButton", "MButton", "XButton1", "XButton2",
         "WheelUp", "WheelDown", "WheelLeft", "WheelRight",
         "Browser_Back", "Browser_Forward", "Browser_Home", "Browser_Search",
         "Browser_Favorites", "Browser_Refresh", "Browser_Stop",
@@ -83,7 +84,8 @@ GetActionSendValue(actionId) {
 CreateDefaultConfig(language := "en-US") {
     mappings := Map()
     for definition in GetMappingDefinitions() {
-        mappings[definition.id] := {key: definition.key, action: definition.action}
+        mappings[definition.id] := {key: definition.key, action: definition.action,
+            holdAction: definition.id = "right" ? "voice" : "disabled", holdMs: 2000}
     }
 
     snippets := []
@@ -95,14 +97,12 @@ CreateDefaultConfig(language := "en-US") {
         schema: 1,
         language: NormalizeLanguage(language),
         autostart: false,
-        leftButtonVoiceEnabled: true,
-        leftButtonVoiceHoldMs: 2000,
         mappings: mappings,
         snippets: snippets
     }
 }
 
-GetLeftButtonVoiceHoldOptions() {
+GetButtonHoldOptions() {
     return [
         {milliseconds: 500, label: "0.5"},
         {milliseconds: 1000, label: "1"},
@@ -117,10 +117,19 @@ GetLeftButtonVoiceHoldOptions() {
     ]
 }
 
-IsSupportedLeftButtonVoiceHoldDuration(milliseconds) {
-    for option in GetLeftButtonVoiceHoldOptions() {
+IsSupportedButtonHoldDuration(milliseconds) {
+    for option in GetButtonHoldOptions() {
         if (option.milliseconds = milliseconds) {
             return true
+        }
+    }
+    return false
+}
+
+SupportsButtonHold(keyName) {
+    for key in GetSupportedKeys() {
+        if (StrLower(keyName) = StrLower(key)) {
+            return !InStr(key, "Wheel")
         }
     }
     return false
@@ -188,11 +197,17 @@ ValidateConfig(config) {
             errors.Push({code: "missing_key", value: definition.id})
             continue
         }
-        if !actions.Has(actionId) {
+        if !actions.Has(actionId) || !actions.Has(mapping.holdAction) {
             errors.Push({code: "unknown_action", value: actionId})
             continue
         }
-        if IsDisabled(actionId) {
+        if !IsSupportedButtonHoldDuration(mapping.holdMs) {
+            errors.Push({code: "invalid_hold_duration", value: keyName})
+        }
+        if !IsDisabled(mapping.holdAction) && !SupportsButtonHold(keyName) {
+            errors.Push({code: "unsupported_hold", value: keyName})
+        }
+        if IsDisabled(actionId) && IsDisabled(mapping.holdAction) {
             continue
         }
 
@@ -202,10 +217,6 @@ ValidateConfig(config) {
         } else {
             used[canonical] := definition.id
         }
-    }
-
-    if !IsSupportedLeftButtonVoiceHoldDuration(config.leftButtonVoiceHoldMs) {
-        errors.Push({code: "invalid_left_hold_duration", value: config.leftButtonVoiceHoldMs})
     }
 
     if (config.snippets.Length < 5) {
@@ -291,12 +302,11 @@ SaveConfigFile(config, filePath) {
     IniWrite(1, tempPath, "Meta", "schema")
     IniWrite(NormalizeLanguage(config.language), tempPath, "Meta", "language")
     IniWrite(config.autostart ? 1 : 0, tempPath, "Meta", "autostart")
-    IniWrite(config.leftButtonVoiceEnabled ? 1 : 0, tempPath, "Meta", "leftButtonVoiceEnabled")
-    IniWrite(config.leftButtonVoiceHoldMs, tempPath, "Meta", "leftButtonVoiceHoldMs")
 
     for definition in GetMappingDefinitions() {
         mapping := config.mappings[definition.id]
         IniWrite(mapping.key "|" mapping.action, tempPath, "Mappings", definition.id)
+        IniWrite(mapping.holdAction "|" mapping.holdMs, tempPath, "Holds", definition.id)
     }
 
     Loop 5 {
@@ -324,25 +334,19 @@ LoadConfigFile(filePath, fallbackLanguage := "en-US") {
     }
     config.language := NormalizeLanguage(IniRead(filePath, "Meta", "language", config.language))
     config.autostart := IniRead(filePath, "Meta", "autostart", "0") = "1"
-    leftButtonVoiceSetting := IniRead(filePath, "Meta", "leftButtonVoiceEnabled",
-        config.leftButtonVoiceEnabled ? "1" : "0")
-    if (leftButtonVoiceSetting != "0" && leftButtonVoiceSetting != "1") {
-        throw Error("config_invalid_left_voice")
-    }
-    config.leftButtonVoiceEnabled := leftButtonVoiceSetting = "1"
-    leftButtonVoiceHoldSetting := IniRead(filePath, "Meta", "leftButtonVoiceHoldMs",
-        config.leftButtonVoiceHoldMs)
-    if !RegExMatch(leftButtonVoiceHoldSetting, "^\d+$") {
-        throw Error("config_invalid_left_hold_duration")
-    }
-    config.leftButtonVoiceHoldMs := Integer(leftButtonVoiceHoldSetting)
-    if !IsSupportedLeftButtonVoiceHoldDuration(config.leftButtonVoiceHoldMs) {
-        throw Error("config_invalid_left_hold_duration")
-    }
-
     for definition in GetMappingDefinitions() {
         saved := IniRead(filePath, "Mappings", definition.id, "__MISSING__")
         if (saved = "__MISSING__") {
+            if (definition.id = "right") {
+                config.mappings["right"].holdAction := IniRead(filePath, "Meta", "leftButtonVoiceEnabled", "1") = "1"
+                    ? "voice" : "disabled"
+                duration := IniRead(filePath, "Meta", "leftButtonVoiceHoldMs", "2000")
+                if !RegExMatch(duration, "^\d+$") || !IsSupportedButtonHoldDuration(Integer(duration)) {
+                    throw Error("config_invalid_hold_duration")
+                }
+                config.mappings["right"].holdMs := Integer(duration)
+                continue
+            }
             throw Error("config_missing_mapping", -1, definition.id)
         }
         separator := InStr(saved, "|")
@@ -354,7 +358,12 @@ LoadConfigFile(filePath, fallbackLanguage := "en-US") {
         if (keyName = "" || actionId = "") {
             throw Error("config_invalid_mapping", -1, definition.id)
         }
-        config.mappings[definition.id] := {key: keyName, action: actionId}
+        hold := StrSplit(IniRead(filePath, "Holds", definition.id, "disabled|2000"), "|")
+        if (hold.Length != 2 || !RegExMatch(hold[2], "^\d+$")) {
+            throw Error("config_invalid_hold")
+        }
+        config.mappings[definition.id] := {key: keyName, action: actionId,
+            holdAction: StrLower(Trim(hold[1])), holdMs: Integer(hold[2])}
     }
 
     Loop 5 {
@@ -429,7 +438,8 @@ LoadLegacyConfigFile(filePath, fallbackLanguage := "en-US", autostart := false) 
         }
         keyName := IniRead(filePath, "Slots", legacyId, definition.key)
         actionId := IniRead(filePath, "Mappings", keyName, "disabled")
-        config.mappings[definition.id] := {key: keyName, action: actionId}
+        config.mappings[definition.id].key := keyName
+        config.mappings[definition.id].action := actionId
     }
 
     Loop 5 {

@@ -2,36 +2,38 @@
 
 ### 把每天反复用到的动作，放到手边的鼠标上。
 
-[下载 v1.0.3](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.3/MouseShortcuts-1.0.3.zip) · [English](README.md) · [更新记录](CHANGELOG.md)
+[下载 v1.0.4](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.4/MouseShortcuts-1.0.4.zip) · [English](README.md) · [更新记录](CHANGELOG.md)
 
-Mouse Shortcuts 是一个常驻 Windows 托盘的小工具，可以把鼠标按键变成常用快捷动作：按住左键打开 Windows 语音输入，侧键发送回车或退格，也可以一键输入保存好的常用文本。
+Mouse Shortcuts 是一个常驻 Windows 托盘的小工具，可以把鼠标按键变成常用快捷动作：按住右键打开 Windows 语音输入，侧键发送回车或退格，也可以一键输入保存好的常用文本。
 
 ## 默认按键
 
 | 鼠标操作 | 动作 |
 | --- | --- |
-| 左键静止长按 2 秒 | 启动 Windows 语音输入（`Win+H`）；松开后结束本次语音输入 |
+| 右键静止长按 2 秒 | 启动 Windows 语音输入（`Win+H`）；松开后结束本次语音输入 |
+| 右键短按 | 原来的右键菜单 |
 | 鼠标中键 | 启动 Windows 语音输入（`Win+H`） |
 | 侧上键 | 回车 |
 | 侧下键 | 退格 |
 
-左键点击仍会正常传给 Windows。指针移动到足以开始拖动时，长按计时会在触发前取消。在设置中可以启用或关闭左键长按说话，并选择 0.5–5 秒的唤醒时长；中键和侧键映射也可以修改。
+左键正常点击、拖动和选字，不再唤醒语音。右键短按保留菜单，长按触发后不再执行单击；指针移动到足以开始拖动时，长按计时会取消。设置中每个按键都有独立的“单击动作”“长按动作”和 0.5–5 秒时长，滚轮只支持单次动作。
 
 ## 为什么把它留在托盘里
 
 - **少伸手找键盘。** 把复制、粘贴、撤销、媒体控制或浏览器前进后退，映射到手边常用的鼠标按键。
-- **按住说话，松开结束。** 左键静止按住 2 秒启动 Windows 语音输入，松开左键结束本次语音输入。
+- **按住说话，松开结束。** 默认右键静止按住 2 秒启动 Windows 语音输入，松开右键结束本次语音输入。
+- **同一个按键，两种用法。** 例如侧键单击回车、长按复制；启用长按后，短按动作在松开时执行。
 - **常用文本一键输入。** 最多保存五条支持中文、Unicode 和多行内容的文本，并为每条设置自己的键盘快捷键。
 - **不写脚本也能改。** 中文/English 设置界面可以检测按键、选择动作、提示快捷键冲突，并立即应用设置。
 - **日常使用不挡手。** 工具收在 Windows 托盘里，可暂停/恢复，也可选择随 Windows 启动。
 
 ## 三步开始
 
-1. 下载并完整解压 [`MouseShortcuts-1.0.3.zip`](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.3/MouseShortcuts-1.0.3.zip)。
+1. 下载并完整解压 [`MouseShortcuts-1.0.4.zip`](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.4/MouseShortcuts-1.0.4.zip)。
 2. 双击 `MouseShortcuts.exe`，按键功能会自动启动。
 3. 单击托盘图标打开设置，修改后点击“保存并立即生效”。关闭设置窗口后，功能继续在托盘运行。
 
-便携包已包含运行所需内容，不需要单独安装 AutoHotkey。个人设置保存在 `%LOCALAPPDATA%\MouseShortcuts\settings.msconfig`，与程序文件分开；换新版本不会覆盖你的按键、语言或文本。
+便携包已包含运行所需内容，不需要单独安装 AutoHotkey。个人设置保存在 `%LOCALAPPDATA%\MouseShortcuts\settings.msconfig`，与程序文件分开；旧版左键语音的开关和时长会迁到右键，其他按键、语言和文本保留。
 
 ## 按自己的习惯调整
 
@@ -48,7 +50,7 @@ Mouse Shortcuts 是一个常驻 Windows 托盘的小工具，可以把鼠标按�
 
 ## 本地运行与语音输入
 
-按键映射在本机执行，设置保存在本机。左键长按时，工具向 Windows 发送 `Win+H` 打开系统语音输入；麦克风权限与语音处理由 Windows 管理，Mouse Shortcuts 本身不录制音频。
+按键映射在本机执行，设置保存在本机。语音长按触发时，工具向 Windows 发送 `Win+H` 打开系统语音输入；麦克风权限与语音处理由 Windows 管理，Mouse Shortcuts 本身不录制音频。
 
 程序不需要管理员权限或账号。鼠标按键能否使用，取决于 Windows 和鼠标驱动是否将它识别为受支持的按键。
 

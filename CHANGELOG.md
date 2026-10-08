@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.4
+
+- Moved hold-to-talk from the left button to the right button so selecting text does not activate voice typing.
+- Added independent click actions, hold actions and 0.5–5 second hold durations for buttons and supported keys. Wheel directions remain click-only.
+- Short right clicks retain the context menu; long presses suppress the short action, and releasing a voice hold ends the session.
+- Migrated the previous voice enable setting and duration to the right button while retaining other mappings and text shortcuts.
+
 ## 1.0.3
 
 - Added an enable switch and adjustable 0.5–5 second left-button voice wake-up duration in Settings.

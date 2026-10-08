@@ -39,8 +39,11 @@ TestDefaults() {
     AssertEqual(config.mappings["side_down"].key, "XButton1", "Lower side button key")
     AssertEqual(config.mappings["side_down"].action, "backspace", "Lower side button action")
     AssertEqual(config.mappings["wheel_up"].action, "disabled", "Unused buttons stay visible but disabled")
-    AssertTrue(config.leftButtonVoiceEnabled, "Left-button voice typing should be enabled by default")
-    AssertEqual(config.leftButtonVoiceHoldMs, 2000, "Left-button voice wake delay should default to two seconds")
+    AssertEqual(config.mappings["right"].key, "RButton", "Right button is the hold-to-talk trigger")
+    AssertEqual(config.mappings["right"].action, "disabled", "Short right clicks remain native")
+    AssertEqual(config.mappings["right"].holdAction, "voice", "Right holds start voice typing")
+    AssertEqual(config.mappings["right"].holdMs, 2000, "Right hold delay defaults to two seconds")
+    AssertTrue(!SupportsButtonHold("LButton"), "Left selection must not acquire a hold mapping")
     AssertEqual(config.snippets.Length, 5, "Five text shortcut slots")
 }
 
@@ -77,19 +80,27 @@ TestConflictValidation() {
     AssertTrue(result.errors.Length > 0, "Enabled text shortcut requires content")
 
     config := CreateDefaultConfig("en-US")
-    config.leftButtonVoiceHoldMs := 600
+    config.mappings["right"].holdMs := 600
     result := ValidateConfig(config)
-    AssertTrue(result.errors.Length > 0, "Unsupported left-button hold durations should be rejected")
+    AssertTrue(result.errors.Length > 0, "Unsupported hold durations should be rejected")
+    config := CreateDefaultConfig("en-US")
+    config.mappings["wheel_up"].holdAction := "copy"
+    AssertTrue(ValidateConfig(config).errors.Length > 0, "Wheel pulses cannot be held")
+    config := CreateDefaultConfig("en-US")
+    config.mappings["side_up"].key := "RButton"
+    AssertTrue(ValidateConfig(config).errors.Length > 0, "Hold-only triggers must participate in duplicate detection")
 }
 
 TestPersistence() {
     path := A_Temp "\MouseShortcuts-Core-Test-" A_TickCount ".ini"
     config := CreateDefaultConfig("en-US")
     config.autostart := true
-    config.leftButtonVoiceEnabled := false
-    config.leftButtonVoiceHoldMs := 1500
+    config.mappings["right"].holdAction := "disabled"
+    config.mappings["right"].holdMs := 1500
     config.mappings["extra_1"].key := "F17"
     config.mappings["extra_1"].action := "copy"
+    config.mappings["extra_1"].holdAction := "paste"
+    config.mappings["extra_1"].holdMs := 500
     config.snippets[1].hotkey := "^!1"
     config.snippets[1].text := "你好`r`nHello"
 
@@ -97,23 +108,30 @@ TestPersistence() {
     loaded := LoadConfigFile(path, "zh-CN")
     AssertEqual(loaded.language, "en-US", "Saved language should load")
     AssertTrue(loaded.autostart, "Autostart should round trip")
-    AssertTrue(!loaded.leftButtonVoiceEnabled, "Left-button voice toggle should round trip")
-    AssertEqual(loaded.leftButtonVoiceHoldMs, 1500, "Left-button hold duration should round trip")
+    AssertEqual(loaded.mappings["right"].holdAction, "disabled", "Hold toggle should round trip")
+    AssertEqual(loaded.mappings["right"].holdMs, 1500, "Hold duration should round trip")
     AssertEqual(loaded.mappings["extra_1"].key, "F17", "Custom key should round trip")
     AssertEqual(loaded.mappings["extra_1"].action, "copy", "Custom action should round trip")
+    AssertEqual(loaded.mappings["extra_1"].holdAction, "paste", "Independent long action should round trip")
+    AssertEqual(loaded.mappings["extra_1"].holdMs, 500, "Per-button hold duration should round trip")
     AssertEqual(loaded.snippets[1].hotkey, "^!1", "Text hotkey should round trip")
     AssertEqual(loaded.snippets[1].text, "你好`r`nHello", "Text content should round trip")
     FileDelete(path)
 }
 
-TestMissingLeftButtonVoiceSettings() {
+TestOldHoldMigration() {
     path := A_Temp "\MouseShortcuts-Old-Config-Test-" A_TickCount ".msconfig"
     SaveConfigFile(CreateDefaultConfig("en-US"), path)
-    IniDelete(path, "Meta", "leftButtonVoiceEnabled")
-    IniDelete(path, "Meta", "leftButtonVoiceHoldMs")
+    IniDelete(path, "Mappings", "right")
+    IniDelete(path, "Holds")
+    IniWrite(1, path, "Meta", "leftButtonVoiceEnabled")
+    IniWrite(500, path, "Meta", "leftButtonVoiceHoldMs")
     loaded := LoadConfigFile(path, "en-US")
-    AssertTrue(loaded.leftButtonVoiceEnabled, "Older config should preserve the built-in left-button voice behavior")
-    AssertEqual(loaded.leftButtonVoiceHoldMs, 2000, "Older config should default the left-button wake delay to two seconds")
+    AssertEqual(loaded.mappings["right"].holdAction, "voice", "Old left voice setting migrates to right")
+    AssertEqual(loaded.mappings["right"].holdMs, 500, "Migration retains the user's hold duration")
+    AssertEqual(loaded.mappings["side_up"].holdAction, "disabled", "Old click mappings do not gain extra holds")
+    IniWrite(0, path, "Meta", "leftButtonVoiceEnabled")
+    AssertEqual(LoadConfigFile(path).mappings["right"].holdAction, "disabled", "Disabled voice remains disabled during migration")
     FileDelete(path)
 }
 
@@ -161,8 +179,8 @@ TestLegacyLoad() {
     AssertEqual(loaded.snippets[1].hotkey, "^!1", "Legacy text hotkey should migrate")
     AssertEqual(loaded.snippets[1].text, snippetText, "Legacy Unicode multiline text should migrate")
     AssertTrue(loaded.autostart, "Manual legacy import should preserve the current autostart choice")
-    AssertTrue(loaded.leftButtonVoiceEnabled, "Legacy config should keep the default left-button voice behavior")
-    AssertEqual(loaded.leftButtonVoiceHoldMs, 2000, "Legacy config should default the left-button wake delay to two seconds")
+    AssertEqual(loaded.mappings["right"].holdAction, "voice", "Legacy config defaults to right-button voice")
+    AssertEqual(loaded.mappings["right"].holdMs, 2000, "Legacy config defaults to two seconds")
     AssertEqual(ValidateConfig(loaded).errors.Length, 0, "Migrated legacy configuration should validate")
     DirDelete(root, true)
 }
@@ -185,7 +203,7 @@ TestLanguageNormalization()
 TestTextCodec()
 TestConflictValidation()
 TestPersistence()
-TestMissingLeftButtonVoiceSettings()
+TestOldHoldMigration()
 TestRejectsInvalidImports()
 TestLegacyDiscovery()
 TestLegacyLoad()

@@ -1,7 +1,7 @@
 ;@Ahk2Exe-SetName Mouse Shortcuts
 ;@Ahk2Exe-SetProductName Mouse Shortcuts
 ;@Ahk2Exe-SetDescription Portable mouse button and text shortcut utility
-;@Ahk2Exe-SetVersion 1.0.3.0
+;@Ahk2Exe-SetVersion 1.0.4.0
 ;@Ahk2Exe-SetOrigFilename MouseShortcuts.exe
 ;@Ahk2Exe-SetCopyright Copyright (c) 2026 Mouse Shortcuts contributors
 

@@ -2,36 +2,38 @@
 
 ### Put the actions you repeat most on the mouse you already use.
 
-[Download v1.0.3](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.3/MouseShortcuts-1.0.3.zip) · [简体中文](README.zh-CN.md) · [Changelog](CHANGELOG.md)
+[Download v1.0.4](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.4/MouseShortcuts-1.0.4.zip) · [简体中文](README.zh-CN.md) · [Changelog](CHANGELOG.md)
 
-Mouse Shortcuts is a small Windows tray app for turning mouse buttons into practical shortcuts. Hold the left button to start Windows Voice Typing, tap a side button for Enter or Backspace, or paste a saved phrase without reaching for the keyboard.
+Mouse Shortcuts is a small Windows tray app for turning mouse buttons into practical shortcuts. Hold the right button to start Windows Voice Typing, tap a side button for Enter or Backspace, or paste a saved phrase without reaching for the keyboard.
 
 ## Default controls
 
 | Mouse action | Result |
 | --- | --- |
-| Hold the left button still for 2 seconds | Start Windows Voice Typing (`Win+H`); release to end the voice session |
+| Hold the right button still for 2 seconds | Start Windows Voice Typing (`Win+H`); release to end the voice session |
+| Short right click | Native context menu |
 | Middle button | Start Windows Voice Typing (`Win+H`) |
 | Upper side button | Enter |
 | Lower side button | Backspace |
 
-Left clicks pass through to Windows as usual. Moving the pointer far enough to begin a drag cancels the left-button hold before it activates. Settings lets you enable or disable the left hold-to-talk gesture and choose its wake-up time from 0.5 to 5 seconds. The middle- and side-button mappings can also be changed.
+Left clicks and text selection stay unchanged. Moving the pointer far enough to begin a drag cancels a pending mouse hold. Settings provides separate click actions, hold actions and 0.5–5 second durations for each supported button. Wheel directions support click actions only. When a hold action is enabled, short clicks execute on release; a long press suppresses the short action.
 
 ## Why keep it around?
 
 - **Reach fewer keys.** Put familiar actions such as copy, paste, undo, media controls, or browser navigation on buttons your hand already finds.
-- **Speak without a keyboard detour.** A stationary two-second left-button hold starts Windows Voice Typing; releasing the button ends that voice session.
+- **Speak without a keyboard detour.** A stationary two-second right-button hold starts Windows Voice Typing; releasing the button ends that voice session.
+- **Give a button two jobs.** For example, click a side button for Enter and hold it for Copy.
 - **Reuse the phrases you type every day.** Save up to five Unicode or multiline text snippets and assign each its own keyboard shortcut.
 - **Adjust it without editing scripts.** The bilingual Settings window can detect buttons, change actions, warn about shortcut conflicts, and apply changes immediately.
 - **Keep it out of the way.** Mouse Shortcuts lives in the system tray, with pause/resume and optional Windows startup controls.
 
 ## Get started
 
-1. Download and fully extract [`MouseShortcuts-1.0.3.zip`](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.3/MouseShortcuts-1.0.3.zip).
+1. Download and fully extract [`MouseShortcuts-1.0.4.zip`](https://github.com/AmberDZW/mouse-shortcuts-ahk/releases/download/v1.0.4/MouseShortcuts-1.0.4.zip).
 2. Double-click `MouseShortcuts.exe`; shortcuts start automatically.
 3. Click the tray icon to open Settings, then save and apply your changes. Closing Settings keeps shortcuts running in the tray.
 
-The portable package includes what it needs; you do not need to install AutoHotkey. Your settings are kept in `%LOCALAPPDATA%\MouseShortcuts\settings.msconfig`, separately from the executable, so replacing the app with a newer release preserves them.
+The portable package includes what it needs; you do not need to install AutoHotkey. Your settings are kept in `%LOCALAPPDATA%\MouseShortcuts\settings.msconfig`, separately from the executable. The previous left-button voice enable setting and duration migrate to the right button; other mappings and saved text are retained.
 
 ## Make it yours
 
